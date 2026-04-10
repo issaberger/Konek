@@ -14,7 +14,7 @@ export default function Leaderboard() {
       try {
         const q = query(
           collection(db, 'users'),
-          orderBy('points', 'desc'),
+          orderBy('homework_solved', 'desc'),
           limit(10)
         );
         const snapshot = await getDocs(q);
@@ -59,8 +59,8 @@ export default function Leaderboard() {
                 </div>
                 
                 <div className="text-right">
-                  <p className="font-bold text-[#D21034]">{leader.points}</p>
-                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-medium">{t('points')}</p>
+                  <p className="font-bold text-[#D21034]">{leader.homework_solved || 0}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-medium">{t('homeworks')}</p>
                 </div>
               </div>
             ))}

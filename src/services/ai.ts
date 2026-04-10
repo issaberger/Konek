@@ -175,7 +175,7 @@ export const generateSpeech = async (text: string, language: string = 'ht'): Pro
     const voiceName = language === 'fr' ? 'Aoede' : 'Kore'; // Use different voices for different languages if needed
     
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
+      model: "gemini-2.5-flash",
       contents: [{ parts: [{ text }] }],
       config: {
         responseModalities: [Modality.AUDIO],

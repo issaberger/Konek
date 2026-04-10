@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Camera, Upload, Mic, MicOff, Volume2, Loader2, CheckCircle2 } from 'lucide-react';
+import { Camera, Upload, Mic, MicOff, Volume2, Loader2, CheckCircle2, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { solveHomework, generateSpeech } from '../services/ai';
@@ -114,8 +114,11 @@ export default function Solver() {
   const playAudio = async () => {
     if (!result) return;
     
-    if (isPlayingAudio && audioRef.current) {
-      audioRef.current.pause();
+    if (isPlayingAudio) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      window.speechSynthesis.cancel();
       setIsPlayingAudio(false);
       return;
     }
@@ -132,7 +135,11 @@ export default function Solver() {
         audio.onended = () => setIsPlayingAudio(false);
         audio.play();
       } else {
-        setIsPlayingAudio(false);
+        // Fallback to browser TTS if Gemini fails
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = language === 'ht' ? 'ht-HT' : 'fr-FR';
+        utterance.onend = () => setIsPlayingAudio(false);
+        window.speechSynthesis.speak(utterance);
       }
     } catch (error) {
       console.error(error);
@@ -154,7 +161,17 @@ export default function Solver() {
           <div className="space-y-6">
             <div className="relative aspect-[3/4] w-full bg-gray-100 rounded-3xl overflow-hidden shadow-inner border-2 border-dashed border-gray-300 flex flex-col items-center justify-center">
               {imagePreview ? (
-                <img src={imagePreview} alt="Devwa" className="w-full h-full object-cover" />
+                <>
+                  <img src={imagePreview} alt="Devwa" className="w-full h-full object-cover" />
+                  {!isSolving && (
+                    <button
+                      onClick={() => { setImage(null); setImagePreview(null); }}
+                      className="absolute top-4 right-4 bg-white/90 text-red-500 p-2 rounded-full shadow-lg hover:bg-red-50 transition-colors z-10"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+                  )}
+                </>
               ) : (
                 <div className="text-center p-6 space-y-4">
                   <div className="bg-white p-4 rounded-full inline-block shadow-sm">
@@ -164,13 +181,15 @@ export default function Solver() {
                 </div>
               )}
               
-              <input 
-                type="file" 
-                accept="image/*" 
-                capture="environment"
-                onChange={handleImageCapture}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
+              {!imagePreview && (
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  capture="environment"
+                  onChange={handleImageCapture}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              )}
             </div>
 
             {imagePreview && (

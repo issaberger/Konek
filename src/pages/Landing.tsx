@@ -32,10 +32,10 @@ export default function Landing() {
       <div className="absolute top-6 right-6 z-20">
         <button 
           onClick={toggleLanguage}
-          className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full backdrop-blur-sm transition-all"
+          className="flex items-center space-x-2 bg-white text-[#00209F] px-5 py-3 rounded-full shadow-xl border-2 border-white/50 hover:scale-105 active:scale-95 transition-all animate-in fade-in zoom-in duration-500"
         >
-          <Globe className="w-4 h-4" />
-          <span className="font-medium text-sm uppercase">{language}</span>
+          <Globe className="w-5 h-5 animate-pulse" />
+          <span className="font-bold text-sm uppercase tracking-wider">{language === 'ht' ? 'Kreyòl' : 'Français'}</span>
         </button>
       </div>
 

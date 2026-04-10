@@ -14,7 +14,7 @@ export const translations: Translations = {
   tagline: { ht: 'Asistan devwa entèlijan ou an Kreyòl.', fr: 'Votre assistant de devoirs intelligent.' },
   loginWithGoogle: { ht: 'Konekte ak Google', fr: 'Se connecter avec Google' },
   startLearning: { ht: 'Kòmanse aprann pi vit jodi a!', fr: 'Commencez à apprendre plus vite aujourd\'hui !' },
-  solverTitle: { ht: 'Konèk Solver', fr: 'Konèk Solver' },
+  solverTitle: { ht: 'Konèk', fr: 'Konèk' },
   takePicture: { ht: 'Pran yon foto devwa ou a', fr: 'Prenez une photo de vos devoirs' },
   clickToTakePic: { ht: 'Klike la pou w pran foto devwa a', fr: 'Cliquez ici pour prendre une photo' },
   askQuestion: { ht: 'Ou gen yon kesyon espesifik? (Si ou vle)', fr: 'Avez-vous une question spécifique ? (Optionnel)' },

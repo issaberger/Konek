@@ -4,6 +4,10 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, orderBy, getDocs, doc, updateDoc, increment } from 'firebase/firestore';
 import { BookOpen, CheckCircle2, Circle, ChevronRight } from 'lucide-react';
+import Markdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 export default function History() {
   const { user } = useAuth();
@@ -12,6 +16,7 @@ export default function History() {
   const [practiceQuestions, setPracticeQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'homeworks' | 'practice'>('homeworks');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -95,7 +100,11 @@ export default function History() {
               <p className="text-center text-gray-500 py-8">{t('noHomeworks')}</p>
             ) : (
               homeworks.map(hw => (
-                <div key={hw.id} className="bg-white p-4 rounded-2xl shadow-sm space-y-2">
+                <div 
+                  key={hw.id} 
+                  className="bg-white p-4 rounded-2xl shadow-sm space-y-2 cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => setExpandedId(expandedId === hw.id ? null : hw.id)}
+                >
                   <div className="flex items-start space-x-3">
                     <div className="bg-blue-50 p-2 rounded-lg">
                       <BookOpen className="w-5 h-5 text-[#00209F]" />
@@ -104,10 +113,20 @@ export default function History() {
                       <p className="text-sm text-gray-500">
                         {hw.created_at?.toDate ? hw.created_at.toDate().toLocaleDateString() : ''}
                       </p>
-                      <p className="font-medium text-gray-900 line-clamp-2 mt-1">{hw.problem_text}</p>
+                      <p className={`font-medium text-gray-900 mt-1 ${expandedId === hw.id ? '' : 'line-clamp-2'}`}>
+                        {hw.problem_text}
+                      </p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${expandedId === hw.id ? 'rotate-90' : ''}`} />
                   </div>
+                  
+                  {expandedId === hw.id && hw.solution_text && (
+                    <div className="mt-4 pt-4 border-t border-gray-100 prose prose-sm prose-blue max-w-none">
+                      <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                        {hw.solution_text}
+                      </Markdown>
+                    </div>
+                  )}
                 </div>
               ))
             )}
