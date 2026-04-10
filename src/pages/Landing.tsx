@@ -8,10 +8,18 @@ import { Link } from 'react-router-dom';
 export default function Landing() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isPhoneAuth, setIsPhoneAuth] = useState(false);
+  const [countryCode, setCountryCode] = useState('+509');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
   const { t, language, setLanguage } = useLanguage();
+
+  const COUNTRIES = [
+    { code: '+509', flag: '🇭🇹', name: 'Haiti' },
+    { code: '+1', flag: '🇺🇸', name: 'US/Canada' },
+    { code: '+33', flag: '🇫🇷', name: 'France' },
+    { code: '+1809', flag: '🇩🇴', name: 'Dominican Rep.' },
+  ];
 
   useEffect(() => {
     if (!window.recaptchaVerifier) {
@@ -36,7 +44,8 @@ export default function Landing() {
     if (!phoneNumber) return;
     setIsLoggingIn(true);
     try {
-      const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+509${phoneNumber}`;
+      const cleanPhone = phoneNumber.replace(/\D/g, '');
+      const formattedPhone = `${countryCode}${cleanPhone}`;
       const appVerifier = window.recaptchaVerifier;
       const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
       setConfirmationResult(confirmation);
@@ -136,13 +145,26 @@ export default function Landing() {
               {!confirmationResult ? (
                 <>
                   <label className="block text-sm font-bold text-gray-700">{t('phoneNumber')}</label>
-                  <input 
-                    type="tel" 
-                    placeholder="+509 3000 0000" 
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D21034]/50"
-                  />
+                  <div className="flex space-x-2">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[#D21034]/50 w-28 text-base"
+                    >
+                      {COUNTRIES.map((country, idx) => (
+                        <option key={idx} value={country.code}>
+                          {country.flag} {country.code}
+                        </option>
+                      ))}
+                    </select>
+                    <input 
+                      type="tel" 
+                      placeholder="3000 0000" 
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D21034]/50"
+                    />
+                  </div>
                   <button
                     onClick={handleSendCode}
                     disabled={isLoggingIn || !phoneNumber}

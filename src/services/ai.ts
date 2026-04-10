@@ -170,13 +170,31 @@ export const solveHomework = async (imageFile: File, voicePrompt?: string, langu
   }
 };
 
+const cleanTextForSpeech = (text: string) => {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1') // bold
+    .replace(/\*(.*?)\*/g, '$1') // italic
+    .replace(/__(.*?)__/g, '$1') // underline
+    .replace(/_(.*?)_/g, '$1') // italic
+    .replace(/`([^`]+)`/g, '$1') // inline code
+    .replace(/```[\s\S]*?```/g, '') // code blocks
+    .replace(/\$\$(.*?)\$\$/g, ' $1 ') // math block
+    .replace(/\$(.*?)\$/g, ' $1 ') // inline math
+    .replace(/#/g, '') // headers
+    .replace(/>/g, '') // blockquotes
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // links
+    .replace(/\n/g, ' ') // newlines
+    .trim();
+};
+
 export const generateSpeech = async (text: string, language: string = 'ht'): Promise<string | null> => {
   try {
-    const voiceName = language === 'fr' ? 'Aoede' : 'Kore'; // Use different voices for different languages if needed
+    const voiceName = 'Aoede'; // Aoede sounds the most natural and less robotic
+    const cleanedText = cleanTextForSpeech(text);
     
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: [{ parts: [{ text }] }],
+      contents: [{ parts: [{ text: cleanedText }] }],
       config: {
         responseModalities: [Modality.AUDIO],
         speechConfig: {
