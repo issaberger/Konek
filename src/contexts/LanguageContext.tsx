@@ -45,6 +45,23 @@ export const translations: Translations = {
   browserNotSupported: { ht: 'Navigatè ou a pa sipòte vwa. Tanpri ekri kesyon ou an.', fr: 'Votre navigateur ne supporte pas la voix. Veuillez écrire votre question.' },
   errorOccurred: { ht: 'Eskize m, gen yon pwoblèm', fr: 'Désolé, il y a un problème' },
   unknownError: { ht: 'Erè enkoni', fr: 'Erreur inconnue' },
+  
+  // About Page
+  about: { ht: 'Konsènan Konèk', fr: 'À propos de Konèk' },
+  aboutKonek: { ht: 'Konèk se yon asistan devwa entèlijan ki bati pou ede elèv an Ayiti reyisi. Nou kwè nan pouvwa edikasyon ak teknoloji.', fr: 'Konèk est un assistant de devoirs intelligent conçu pour aider les élèves en Haïti à réussir. Nous croyons au pouvoir de l\'éducation et de la technologie.' },
+  creator: { ht: 'Kreyatè: Issa Berger', fr: 'Créateur : Issa Berger' },
+  learnMore: { ht: 'Aprann Plis', fr: 'En Savoir Plus' },
+  contactUs: { ht: 'Kontakte Nou', fr: 'Contactez-nous' },
+  
+  // Phone Auth
+  phoneSignIn: { ht: 'Konekte ak Telefòn', fr: 'Se connecter par téléphone' },
+  phoneNumber: { ht: 'Nimewo Telefòn', fr: 'Numéro de téléphone' },
+  sendCode: { ht: 'Voye Kòd', fr: 'Envoyer le code' },
+  enterCode: { ht: 'Antre Kòd la', fr: 'Entrez le code' },
+  verifyCode: { ht: 'Verifye Kòd', fr: 'Vérifier le code' },
+  or: { ht: 'OSWA', fr: 'OU' },
+  invalidPhone: { ht: 'Nimewo telefòn pa bon', fr: 'Numéro de téléphone invalide' },
+  codeSent: { ht: 'Kòd la voye!', fr: 'Code envoyé !' },
 };
 
 interface LanguageContextType {

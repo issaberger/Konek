@@ -14,13 +14,13 @@ export default function Layout() {
     );
   }
 
-  const isPublicRoute = location.pathname === '/' || location.pathname === '/index.html';
+  const isPublicRoute = location.pathname === '/' || location.pathname === '/index.html' || location.pathname === '/about';
 
   if (!user && !isPublicRoute) {
     return <Navigate to="/" replace />;
   }
 
-  if (user && isPublicRoute) {
+  if (user && (location.pathname === '/' || location.pathname === '/index.html')) {
     return <Navigate to="/solver" replace />;
   }
 

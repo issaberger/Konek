@@ -12,6 +12,7 @@ import Solver from './pages/Solver';
 import History from './pages/History';
 import Profile from './pages/Profile';
 import Leaderboard from './pages/Leaderboard';
+import About from './pages/About';
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
               <Route path="/history" element={<History />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/about" element={<About />} />
             </Route>
           </Routes>
         </BrowserRouter>

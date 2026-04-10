@@ -1,7 +1,8 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { logout } from '../lib/firebase';
-import { Flame, Star, Award, LogOut } from 'lucide-react';
+import { Flame, Star, Award, LogOut, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Profile() {
   const { user, userData } = useAuth();
@@ -28,7 +29,7 @@ export default function Profile() {
           />
           <div>
             <h2 className="text-xl font-bold text-gray-900">{userData.displayName}</h2>
-            <p className="text-gray-500">{userData.email}</p>
+            <p className="text-gray-500">{userData.email || user?.phoneNumber}</p>
             <div className="inline-block mt-2 px-3 py-1 bg-blue-100 text-[#00209F] text-xs font-bold uppercase tracking-wider rounded-full">
               {userData.grade_level}
             </div>
@@ -73,6 +74,16 @@ export default function Profile() {
             )}
           </div>
         </div>
+
+        {/* About Link */}
+        <Link to="/about" className="bg-white rounded-3xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-colors">
+          <div className="flex items-center space-x-3">
+            <div className="bg-blue-50 p-2 rounded-full">
+              <Info className="w-5 h-5 text-[#00209F]" />
+            </div>
+            <span className="font-bold text-gray-900">{t('about')}</span>
+          </div>
+        </Link>
       </main>
     </div>
   );
