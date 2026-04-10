@@ -1,0 +1,8 @@
+{
+  "name": "Konek",
+  "description": "A highly-viral, lightning-fast AI homework assistant designed specifically for students in Haiti.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

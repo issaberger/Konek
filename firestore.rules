@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) 
+                    && hasRequiredFields(['uid', 'email', 'points', 'streak_days', 'homework_solved'])
+                    && request.resource.data.uid == userId
+                    && request.resource.data.points == 0
+                    && request.resource.data.streak_days == 0
+                    && request.resource.data.homework_solved == 0;
+      allow update: if isOwner(userId)
+                    && request.resource.data.uid == resource.data.uid
+                    && request.resource.data.email == resource.data.email;
+    }
+    
+    // Homeworks Collection
+    match /homeworks/{homeworkId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() 
+                    && request.resource.data.userId == request.auth.uid
+                    && hasRequiredFields(['userId', 'problem_text', 'solution_text', 'created_at']);
+      allow update: if false; // Homeworks are immutable
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Practice Questions Collection
+    match /practice_questions/{questionId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated()
+                    && request.resource.data.userId == request.auth.uid
+                    && hasRequiredFields(['userId', 'homeworkId', 'question', 'options', 'correct_answer', 'completed']);
+      allow update: if isAuthenticated() 
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.homeworkId == resource.data.homeworkId
+                    && request.resource.data.question == resource.data.question
+                    && request.resource.data.options == resource.data.options
+                    && request.resource.data.correct_answer == resource.data.correct_answer;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+  }
+}

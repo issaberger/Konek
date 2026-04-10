@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the Konek app",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "grade_level": { "type": "string" },
+        "points": { "type": "number" },
+        "badges": { "type": "array", "items": { "type": "string" } },
+        "streak_days": { "type": "number" },
+        "last_active": { "type": "string", "format": "date-time" },
+        "homework_solved": { "type": "number" }
+      },
+      "required": ["uid", "email", "points", "streak_days", "homework_solved"]
+    },
+    "Homework": {
+      "title": "Homework",
+      "description": "A homework problem solved by the AI",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "problem_text": { "type": "string" },
+        "solution_text": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "problem_text", "solution_text", "created_at"]
+    },
+    "PracticeQuestion": {
+      "title": "PracticeQuestion",
+      "description": "A practice question generated for a homework",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "homeworkId": { "type": "string" },
+        "question": { "type": "string" },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "correct_answer": { "type": "string" },
+        "completed": { "type": "boolean" }
+      },
+      "required": ["userId", "homeworkId", "question", "options", "correct_answer", "completed"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/homeworks/{homeworkId}": {
+      "schema": { "$ref": "#/entities/Homework" },
+      "description": "Solved homeworks"
+    },
+    "/practice_questions/{questionId}": {
+      "schema": { "$ref": "#/entities/PracticeQuestion" },
+      "description": "Practice questions"
+    }
+  }
+}
