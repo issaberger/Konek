@@ -50,9 +50,13 @@ export default function Landing() {
       const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
       setConfirmationResult(confirmation);
       alert(t('codeSent'));
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert(t('invalidPhone'));
+      if (error.code === 'auth/unauthorized-domain') {
+        alert(t('phoneAuthError'));
+      } else {
+        alert(`${t('invalidPhone')} (${error.message})`);
+      }
     } finally {
       setIsLoggingIn(false);
     }

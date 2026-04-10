@@ -159,38 +159,68 @@ export default function Solver() {
       <main className="flex-1 p-4 space-y-6 pb-24">
         {!result ? (
           <div className="space-y-6">
-            <div className="relative aspect-[3/4] w-full bg-gray-100 rounded-3xl overflow-hidden shadow-inner border-2 border-dashed border-gray-300 flex flex-col items-center justify-center">
-              {imagePreview ? (
-                <>
-                  <img src={imagePreview} alt="Devwa" className="w-full h-full object-cover" />
-                  {!isSolving && (
-                    <button
-                      onClick={() => { setImage(null); setImagePreview(null); }}
-                      className="absolute top-4 right-4 bg-white/90 text-red-500 p-2 rounded-full shadow-lg hover:bg-red-50 transition-colors z-10"
-                    >
-                      <X className="w-6 h-6" />
-                    </button>
-                  )}
-                </>
-              ) : (
-                <div className="text-center p-6 space-y-4">
-                  <div className="bg-white p-4 rounded-full inline-block shadow-sm">
-                    <Camera className="w-10 h-10 text-[#D21034]" />
+            {!imagePreview ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Camera Button */}
+                  <div className="relative bg-white p-6 rounded-3xl shadow-sm border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors aspect-square">
+                    <Camera className="w-10 h-10 text-[#D21034] mb-3" />
+                    <p className="text-gray-600 font-medium text-center text-sm">{t('takePicture')}</p>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      capture="environment"
+                      onChange={handleImageCapture}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
                   </div>
-                  <p className="text-gray-600 font-medium">{t('clickToTakePic')}</p>
+                  
+                  {/* Upload Button */}
+                  <div className="relative bg-white p-6 rounded-3xl shadow-sm border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors aspect-square">
+                    <Upload className="w-10 h-10 text-[#00209F] mb-3" />
+                    <p className="text-gray-600 font-medium text-center text-sm">{t('uploadPhoto')}</p>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageCapture}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                  </div>
                 </div>
-              )}
-              
-              {!imagePreview && (
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  capture="environment"
-                  onChange={handleImageCapture}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-              )}
-            </div>
+
+                <div className="relative flex items-center py-2">
+                  <div className="flex-grow border-t border-gray-300"></div>
+                  <span className="flex-shrink-0 mx-4 text-gray-400 text-sm font-bold uppercase">{t('or')}</span>
+                  <div className="flex-grow border-t border-gray-300"></div>
+                </div>
+
+                {/* Type Homework (Coming Soon) */}
+                <div 
+                  onClick={() => alert(t('comingSoon'))}
+                  className="w-full bg-white border-2 border-gray-200 rounded-2xl p-5 flex flex-col space-y-2 cursor-pointer hover:bg-gray-50 transition-colors shadow-sm relative overflow-hidden"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-medium">{t('typeHomework')}</span>
+                    <span className="bg-blue-100 text-[#00209F] text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Coming Soon</span>
+                  </div>
+                  <div className="h-10 bg-gray-50 rounded-xl border border-gray-100 flex items-center px-3">
+                    <span className="text-gray-400 text-sm">e.g. 2x + 4 = 10...</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="relative aspect-[3/4] w-full bg-gray-100 rounded-3xl overflow-hidden shadow-inner border-2 border-dashed border-gray-300 flex flex-col items-center justify-center">
+                <img src={imagePreview} alt="Devwa" className="w-full h-full object-cover" />
+                {!isSolving && (
+                  <button
+                    onClick={() => { setImage(null); setImagePreview(null); }}
+                    className="absolute top-4 right-4 bg-white/90 text-red-500 p-2 rounded-full shadow-lg hover:bg-red-50 transition-colors z-10"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                )}
+              </div>
+            )}
 
             {imagePreview && (
               <div className="bg-white p-4 rounded-2xl shadow-sm space-y-3">

@@ -62,6 +62,12 @@ export const translations: Translations = {
   or: { ht: 'OSWA', fr: 'OU' },
   invalidPhone: { ht: 'Nimewo telefòn pa bon', fr: 'Numéro de téléphone invalide' },
   codeSent: { ht: 'Kòd la voye!', fr: 'Code envoyé !' },
+  phoneAuthError: { ht: 'Erè: Ou dwe ajoute domèn sa a nan "Authorized domains" nan Firebase Console pou Phone Auth mache.', fr: 'Erreur : Vous devez ajouter ce domaine aux "Authorized domains" dans la console Firebase.' },
+  
+  // New Features
+  uploadPhoto: { ht: 'Voye yon foto', fr: 'Télécharger une photo' },
+  typeHomework: { ht: 'Ekri devwa ou a...', fr: 'Tapez vos devoirs...' },
+  comingSoon: { ht: 'Karakteristik sa a ap vini byento! 🚀', fr: 'Cette fonctionnalité arrive bientôt ! 🚀' },
 };
 
 interface LanguageContextType {
