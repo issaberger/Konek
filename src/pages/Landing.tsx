@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { signInWithGoogle } from '../lib/firebase';
-import { BookOpen, Sparkles } from 'lucide-react';
+import { BookOpen, Sparkles, Globe } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Landing() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const { t, language, setLanguage } = useLanguage();
 
   const handleLogin = async () => {
     setIsLoggingIn(true);
@@ -16,37 +18,58 @@ export default function Landing() {
     }
   };
 
+  const toggleLanguage = () => {
+    setLanguage(language === 'ht' ? 'fr' : 'ht');
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-[#FF6321] text-white">
-      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm text-center space-y-8">
-        <div className="bg-white/20 p-6 rounded-full">
-          <BookOpen className="w-20 h-20 text-white" />
+    <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-[#D21034] relative overflow-hidden">
+      {/* Minimal Haitian Culture Design Elements */}
+      <div className="absolute top-0 left-0 w-full h-32 bg-[#00209F] opacity-90 rounded-b-[50%] transform -translate-y-16"></div>
+      <div className="absolute bottom-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+      <div className="absolute top-1/4 left-10 w-32 h-32 bg-yellow-400 opacity-10 rounded-full blur-2xl"></div>
+
+      <div className="absolute top-6 right-6 z-20">
+        <button 
+          onClick={toggleLanguage}
+          className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full backdrop-blur-sm transition-all"
+        >
+          <Globe className="w-4 h-4" />
+          <span className="font-medium text-sm uppercase">{language}</span>
+        </button>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm text-center space-y-8 z-10">
+        <div className="bg-white p-6 rounded-full shadow-2xl transform hover:scale-105 transition-transform">
+          <BookOpen className="w-20 h-20 text-[#00209F]" />
         </div>
         
         <div className="space-y-4">
-          <h1 className="text-5xl font-bold tracking-tight font-serif">Konek</h1>
-          <p className="text-lg text-white/90 font-medium">
-            Asistan devwa entèlijan ou an Kreyòl.
+          <h1 className="text-6xl font-bold tracking-tight font-serif text-white drop-shadow-md">
+            {t('appName')}
+          </h1>
+          <p className="text-xl text-white/95 font-medium max-w-[280px] mx-auto leading-relaxed">
+            {t('tagline')}
           </p>
         </div>
 
-        <div className="w-full space-y-4 pt-8">
+        <div className="w-full space-y-5 pt-8">
           <button
             onClick={handleLogin}
             disabled={isLoggingIn}
-            className="w-full flex items-center justify-center space-x-2 bg-white text-[#FF6321] py-4 px-6 rounded-full font-bold text-lg shadow-lg hover:bg-gray-50 transition-colors disabled:opacity-70"
+            className="w-full flex items-center justify-center space-x-3 bg-white text-[#D21034] py-4 px-6 rounded-2xl font-bold text-lg shadow-xl hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-70"
           >
             {isLoggingIn ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#FF6321] border-t-transparent"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#D21034] border-t-transparent"></div>
             ) : (
               <>
-                <Sparkles className="w-5 h-5" />
-                <span>Konekte ak Google</span>
+                <Sparkles className="w-6 h-6 text-[#00209F]" />
+                <span>{t('loginWithGoogle')}</span>
               </>
             )}
           </button>
-          <p className="text-sm text-white/70">
-            Kòmanse aprann pi vit jodi a!
+          <p className="text-sm text-white/80 font-medium">
+            {t('startLearning')}
           </p>
         </div>
       </div>

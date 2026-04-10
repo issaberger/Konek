@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
 import { Camera, Upload, Mic, MicOff, Volume2, Loader2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { solveHomework, generateSpeech } from '../services/ai';
-import { db } from '../lib/firebase';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, addDoc, doc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 import Markdown from 'react-markdown';
 import remarkMath from 'remark-math';
@@ -11,6 +12,7 @@ import 'katex/dist/katex.min.css';
 
 export default function Solver() {
   const { user, refreshUserData } = useAuth();
+  const { t, language } = useLanguage();
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [voicePrompt, setVoicePrompt] = useState('');
@@ -32,14 +34,12 @@ export default function Solver() {
   const toggleRecording = () => {
     if (isRecording) {
       setIsRecording(false);
-      // In a real app, stop MediaRecorder here. For now, we simulate Web Speech API.
     } else {
       setIsRecording(true);
-      // Simulate Web Speech API for Kreyòl
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
-        recognition.lang = 'ht-HT'; // Try Haitian Creole, fallback to fr-FR if unsupported
+        recognition.lang = language === 'ht' ? 'ht-HT' : 'fr-FR'; 
         recognition.onresult = (event: any) => {
           setVoicePrompt(event.results[0][0].transcript);
           setIsRecording(false);
@@ -47,7 +47,7 @@ export default function Solver() {
         recognition.onerror = () => setIsRecording(false);
         recognition.start();
       } else {
-        alert("Navigatè ou a pa sipòte vwa. Tanpri ekri kesyon ou an.");
+        alert(t('browserNotSupported'));
         setIsRecording(false);
       }
     }
@@ -58,41 +58,54 @@ export default function Solver() {
     
     setIsSolving(true);
     try {
-      const { problemText, solutionText, practiceQuestion } = await solveHomework(image, voicePrompt);
+      const { problemText, solutionText, practiceQuestion } = await solveHomework(image, voicePrompt, language);
       
       setResult({ problemText, solutionText });
 
-      // Save to Firestore
-      const homeworkRef = await addDoc(collection(db, 'homeworks'), {
-        userId: user.uid,
-        problem_text: problemText,
-        solution_text: solutionText,
-        created_at: serverTimestamp()
-      });
-
-      if (practiceQuestion && practiceQuestion.question) {
-        await addDoc(collection(db, 'practice_questions'), {
+      let homeworkRef;
+      try {
+        homeworkRef = await addDoc(collection(db, 'homeworks'), {
           userId: user.uid,
-          homeworkId: homeworkRef.id,
-          ...practiceQuestion,
-          completed: false
+          problem_text: problemText,
+          solution_text: solutionText,
+          created_at: serverTimestamp()
         });
+      } catch (e) {
+        handleFirestoreError(e, OperationType.CREATE, 'homeworks');
+        throw e;
       }
 
-      // Update user points and streak
-      const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
-        points: increment(50),
-        homework_solved: increment(1),
-        last_active: new Date().toISOString()
-        // Streak logic would go here (check if last_active was yesterday)
-      });
+      if (practiceQuestion && practiceQuestion.question) {
+        try {
+          await addDoc(collection(db, 'practice_questions'), {
+            userId: user.uid,
+            homeworkId: homeworkRef.id,
+            ...practiceQuestion,
+            completed: false
+          });
+        } catch (e) {
+          handleFirestoreError(e, OperationType.CREATE, 'practice_questions');
+          throw e;
+        }
+      }
+
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+          points: increment(50),
+          homework_solved: increment(1),
+          last_active: new Date().toISOString()
+        });
+      } catch (e) {
+        handleFirestoreError(e, OperationType.UPDATE, 'users');
+        throw e;
+      }
 
       await refreshUserData();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error solving homework:", error);
-      alert("Eskize m, gen yon pwoblèm. Tanpri eseye ankò.");
+      alert(`${t('errorOccurred')}: ${error.message || t('unknownError')}`);
     } finally {
       setIsSolving(false);
     }
@@ -109,9 +122,8 @@ export default function Solver() {
 
     setIsPlayingAudio(true);
     try {
-      // Clean up markdown for speech
       const cleanText = result.solutionText.replace(/[#*`]/g, '');
-      const base64Audio = await generateSpeech(cleanText);
+      const base64Audio = await generateSpeech(cleanText, language);
       
       if (base64Audio) {
         const audioUrl = `data:audio/wav;base64,${base64Audio}`;
@@ -130,24 +142,25 @@ export default function Solver() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f5f5f0]">
-      <header className="bg-white p-4 shadow-sm sticky top-0 z-10">
-        <h1 className="text-2xl font-serif font-bold text-[#FF6321]">Konek Solver</h1>
-        <p className="text-sm text-gray-500">Pran yon foto devwa ou a</p>
+      <header className="bg-white p-4 shadow-sm sticky top-0 z-10 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-serif font-bold text-[#00209F]">{t('solverTitle')}</h1>
+          <p className="text-sm text-gray-500">{t('takePicture')}</p>
+        </div>
       </header>
 
       <main className="flex-1 p-4 space-y-6 pb-24">
         {!result ? (
           <div className="space-y-6">
-            {/* Camera / Upload Area */}
             <div className="relative aspect-[3/4] w-full bg-gray-100 rounded-3xl overflow-hidden shadow-inner border-2 border-dashed border-gray-300 flex flex-col items-center justify-center">
               {imagePreview ? (
                 <img src={imagePreview} alt="Devwa" className="w-full h-full object-cover" />
               ) : (
                 <div className="text-center p-6 space-y-4">
                   <div className="bg-white p-4 rounded-full inline-block shadow-sm">
-                    <Camera className="w-10 h-10 text-[#FF6321]" />
+                    <Camera className="w-10 h-10 text-[#D21034]" />
                   </div>
-                  <p className="text-gray-600 font-medium">Klike la pou w pran foto devwa a</p>
+                  <p className="text-gray-600 font-medium">{t('clickToTakePic')}</p>
                 </div>
               )}
               
@@ -160,17 +173,16 @@ export default function Solver() {
               />
             </div>
 
-            {/* Voice / Text Prompt */}
             {imagePreview && (
               <div className="bg-white p-4 rounded-2xl shadow-sm space-y-3">
-                <label className="text-sm font-medium text-gray-700">Ou gen yon kesyon espesifik? (Si ou vle)</label>
+                <label className="text-sm font-medium text-gray-700">{t('askQuestion')}</label>
                 <div className="flex items-center space-x-2">
                   <input 
                     type="text"
                     value={voicePrompt}
                     onChange={(e) => setVoicePrompt(e.target.value)}
-                    placeholder="Ekri oswa pale kesyon ou an..."
-                    className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6321]/50"
+                    placeholder={t('typeOrSpeak')}
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#00209F]/50"
                   />
                   <button 
                     onClick={toggleRecording}
@@ -182,42 +194,40 @@ export default function Solver() {
               </div>
             )}
 
-            {/* Submit Button */}
             {imagePreview && (
               <button 
                 onClick={handleSubmit}
                 disabled={isSolving}
-                className="w-full bg-[#FF6321] text-white font-bold text-lg py-4 rounded-2xl shadow-lg hover:bg-[#e5581c] transition-colors disabled:opacity-70 flex items-center justify-center space-x-2"
+                className="w-full bg-[#D21034] text-white font-bold text-lg py-4 rounded-2xl shadow-lg hover:bg-[#b00d2b] transition-colors disabled:opacity-70 flex items-center justify-center space-x-2"
               >
                 {isSolving ? (
                   <>
                     <Loader2 className="w-6 h-6 animate-spin" />
-                    <span>Konek ap reflechi...</span>
+                    <span>{t('thinking')}</span>
                   </>
                 ) : (
                   <>
                     <CheckCircle2 className="w-6 h-6" />
-                    <span>Rezoud Devwa a</span>
+                    <span>{t('solveHomework')}</span>
                   </>
                 )}
               </button>
             )}
           </div>
         ) : (
-          /* Result Area */
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="bg-white rounded-3xl p-6 shadow-sm space-y-6">
               <div className="flex justify-between items-start">
-                <h2 className="text-xl font-bold text-gray-900">Eksplikasyon</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('explanation')}</h2>
                 <button 
                   onClick={playAudio}
-                  className={`p-3 rounded-full transition-colors ${isPlayingAudio ? 'bg-[#FF6321] text-white shadow-md' : 'bg-orange-50 text-[#FF6321]'}`}
+                  className={`p-3 rounded-full transition-colors ${isPlayingAudio ? 'bg-[#00209F] text-white shadow-md' : 'bg-blue-50 text-[#00209F]'}`}
                 >
                   <Volume2 className="w-6 h-6" />
                 </button>
               </div>
               
-              <div className="prose prose-orange max-w-none">
+              <div className="prose prose-blue max-w-none">
                 <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                   {result.solutionText}
                 </Markdown>
@@ -233,7 +243,7 @@ export default function Solver() {
               }}
               className="w-full bg-white text-gray-700 font-bold text-lg py-4 rounded-2xl shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
             >
-              Fè yon lòt devwa
+              {t('anotherHomework')}
             </button>
           </div>
         )}
