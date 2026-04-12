@@ -68,6 +68,31 @@ export const translations: Translations = {
   uploadPhoto: { ht: 'Voye yon foto', fr: 'Télécharger une photo' },
   typeHomework: { ht: 'Ekri devwa ou a...', fr: 'Tapez vos devoirs...' },
   comingSoon: { ht: 'Karakteristik sa a ap vini byento! 🚀', fr: 'Cette fonctionnalité arrive bientôt ! 🚀' },
+  
+  // Profile & Settings
+  editProfile: { ht: 'Modifye Pwofil', fr: 'Modifier le profil' },
+  save: { ht: 'Sove', fr: 'Enregistrer' },
+  cancel: { ht: 'Anile', fr: 'Annuler' },
+  name: { ht: 'Non', fr: 'Nom' },
+  notSet: { ht: 'Poko mete', fr: 'Non défini' },
+  changePicture: { ht: 'Chanje Foto', fr: 'Changer la photo' },
+  
+  // History Delete
+  delete: { ht: 'Efase', fr: 'Supprimer' },
+  confirmDelete: { ht: 'Èske ou sèten ou vle efase sa?', fr: 'Êtes-vous sûr de vouloir supprimer ceci ?' },
+  
+  // Terms
+  terms: { ht: 'Kondisyon Itilizasyon', fr: 'Conditions d\'utilisation' },
+  
+  // Welcome Modal
+  welcomeTitle: { ht: '🚨 Bloke sou yon devwa?', fr: '🚨 Bloqué sur un devoir ?' },
+  welcomeSubtitle: { ht: '100% GRATIS asistan devwa entèlijan bati espesyalman pou ou', fr: 'Assistant de devoirs intelligent 100% GRATUIT conçu spécialement pour vous' },
+  howItWorks: { ht: 'Kijan li mache:', fr: 'Comment ça marche :' },
+  step1: { ht: '📸 Pran yon foto (oswa voye yon foto ou genyen deja) nan pwoblèm devwa ou a.', fr: '📸 Prenez une photo (ou téléchargez une photo existante) de votre problème de devoir.' },
+  step2: { ht: '🤖 Jwenn èd ak eksplikasyon etap pa etap nan yon Kreyòl pafè.', fr: '🤖 Obtenez de l\'aide et des explications étape par étape dans un Créole parfait.' },
+  step3: { ht: '✅ Mache pou Matematik, Syans, Istwa, ak plis ankò!', fr: '✅ Fonctionne pour les Mathématiques, les Sciences, l\'Histoire, et plus encore !' },
+  noStress: { ht: 'Pa gen kat kredi, pa gen estrès. Jis sipò an tan reyèl, tou dwat sou telefòn ou.', fr: 'Pas de carte de crédit, pas de stress. Juste un support en temps réel, directement sur votre téléphone.' },
+  tryNow: { ht: '👉 Eseye li kounye a gratis:', fr: '👉 Essayez-le maintenant gratuitement :' },
 };
 
 interface LanguageContextType {

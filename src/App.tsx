@@ -13,6 +13,7 @@ import History from './pages/History';
 import Profile from './pages/Profile';
 import Leaderboard from './pages/Leaderboard';
 import About from './pages/About';
+import Terms from './pages/Terms';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/about" element={<About />} />
+              <Route path="/terms" element={<Terms />} />
             </Route>
           </Routes>
         </BrowserRouter>

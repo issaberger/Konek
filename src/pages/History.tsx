@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { collection, query, where, orderBy, getDocs, doc, updateDoc, increment } from 'firebase/firestore';
-import { BookOpen, CheckCircle2, Circle, ChevronRight } from 'lucide-react';
+import { collection, query, where, orderBy, getDocs, doc, updateDoc, increment, deleteDoc } from 'firebase/firestore';
+import { BookOpen, CheckCircle2, Circle, ChevronRight, Trash2, X } from 'lucide-react';
 import Markdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -17,6 +17,7 @@ export default function History() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'homeworks' | 'practice'>('homeworks');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -65,6 +66,16 @@ export default function History() {
       }
     } else {
       alert(t('incorrect'));
+    }
+  };
+
+  const handleDeleteHomework = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'homeworks', id));
+      setHomeworks(prev => prev.filter(hw => hw.id !== id));
+      setDeleteConfirmId(null);
+    } catch (e) {
+      handleFirestoreError(e, OperationType.DELETE, 'homeworks');
     }
   };
 
@@ -117,7 +128,15 @@ export default function History() {
                         {hw.problem_text}
                       </p>
                     </div>
-                    <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${expandedId === hw.id ? 'rotate-90' : ''}`} />
+                    <div className="flex items-center space-x-2">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(hw.id); }}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                      <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${expandedId === hw.id ? 'rotate-90' : ''}`} />
+                    </div>
                   </div>
                   
                   {expandedId === hw.id && hw.solution_text && (
@@ -130,6 +149,35 @@ export default function History() {
                 </div>
               ))
             )}
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirmId && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 animate-in fade-in zoom-in duration-200">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-gray-900">{t('delete')}</h3>
+                <button onClick={() => setDeleteConfirmId(null)} className="p-2 text-gray-400 hover:bg-gray-100 rounded-full">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-gray-600">{t('confirmDelete')}</p>
+              <div className="flex space-x-3 pt-2">
+                <button 
+                  onClick={() => setDeleteConfirmId(null)}
+                  className="flex-1 py-3 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                >
+                  {t('cancel')}
+                </button>
+                <button 
+                  onClick={() => handleDeleteHomework(deleteConfirmId)}
+                  className="flex-1 py-3 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-colors"
+                >
+                  {t('delete')}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

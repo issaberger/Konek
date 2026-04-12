@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { signInWithGoogle, auth } from '../lib/firebase';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
-import { BookOpen, Sparkles, Globe, Phone, ArrowRight, Info } from 'lucide-react';
+import { BookOpen, Sparkles, Globe, Phone, ArrowRight, Info, X, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ export default function Landing() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
+  const [showWelcome, setShowWelcome] = useState(false);
   const { t, language, setLanguage } = useLanguage();
 
   const COUNTRIES = [
@@ -27,7 +28,16 @@ export default function Landing() {
         size: 'invisible',
       });
     }
+    
+    if (!localStorage.getItem('konek_welcomed')) {
+      setShowWelcome(true);
+    }
   }, []);
+
+  const closeWelcome = () => {
+    localStorage.setItem('konek_welcomed', 'true');
+    setShowWelcome(false);
+  };
 
   const handleGoogleLogin = async () => {
     setIsLoggingIn(true);
@@ -207,6 +217,54 @@ export default function Landing() {
 
       <div id="recaptcha-container"></div>
 
+      {/* Welcome Modal */}
+      {showWelcome && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-6 animate-in fade-in zoom-in duration-300 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#00209F] to-[#D21034]"></div>
+            
+            <button onClick={closeWelcome} className="absolute top-4 right-4 p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-2 pt-2">
+              <h2 className="text-2xl font-bold text-gray-900 leading-tight">{t('welcomeTitle')}</h2>
+              <p className="text-[#00209F] font-medium">{t('welcomeSubtitle')}</p>
+            </div>
+
+            <div className="space-y-4 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+              <h3 className="font-bold text-gray-900">{t('howItWorks')}</h3>
+              <ul className="space-y-3 text-sm text-gray-700">
+                <li className="flex items-start space-x-2">
+                  <span className="text-xl leading-none">📸</span>
+                  <span>{t('step1')}</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-xl leading-none">🤖</span>
+                  <span>{t('step2')}</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-xl leading-none">✅</span>
+                  <span>{t('step3')}</span>
+                </li>
+              </ul>
+            </div>
+
+            <p className="text-sm font-medium text-gray-600 italic text-center">
+              {t('noStress')}
+            </p>
+
+            <button 
+              onClick={closeWelcome}
+              className="w-full bg-[#D21034] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-[#b00d2b] transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>{t('tryNow')}</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <footer className="mt-auto bg-[#00209F] text-white/80 py-6 px-6 z-10 relative overflow-hidden">
         {/* Subtle Haitian Art Pattern in Footer */}
@@ -222,10 +280,15 @@ export default function Landing() {
         </div>
 
         <div className="max-w-sm mx-auto flex flex-col items-center justify-center space-y-4 relative z-10">
-          <Link to="/about" className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-colors">
-            <Info className="w-4 h-4" />
-            <span className="text-sm font-medium">{t('about')}</span>
-          </Link>
+          <div className="flex space-x-4">
+            <Link to="/about" className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-colors">
+              <Info className="w-4 h-4" />
+              <span className="text-sm font-medium">{t('about')}</span>
+            </Link>
+            <Link to="/terms" className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-colors">
+              <span className="text-sm font-medium">{t('terms')}</span>
+            </Link>
+          </div>
           <div className="text-xs text-center space-y-1">
             <p>Konèk © {new Date().getFullYear()}</p>
             <p className="opacity-75">{t('creator')}</p>
