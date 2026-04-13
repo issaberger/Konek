@@ -40,11 +40,26 @@ export default function Solver() {
       if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         recognition.lang = language === 'ht' ? 'ht-HT' : 'fr-FR'; 
+        recognition.continuous = false;
+        recognition.interimResults = true;
+
         recognition.onresult = (event: any) => {
-          setVoicePrompt(event.results[0][0].transcript);
+          const transcript = Array.from(event.results)
+            .map((result: any) => result[0])
+            .map((result: any) => result.transcript)
+            .join('');
+          setVoicePrompt(transcript);
+        };
+
+        recognition.onend = () => {
           setIsRecording(false);
         };
-        recognition.onerror = () => setIsRecording(false);
+
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsRecording(false);
+        };
+
         recognition.start();
       } else {
         alert(t('browserNotSupported'));

@@ -23,8 +23,8 @@ export default function Landing() {
   ];
 
   useEffect(() => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    if (!(window as any).recaptchaVerifier) {
+      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         size: 'invisible',
       });
     }
@@ -56,7 +56,7 @@ export default function Landing() {
     try {
       const cleanPhone = phoneNumber.replace(/\D/g, '');
       const formattedPhone = `${countryCode}${cleanPhone}`;
-      const appVerifier = window.recaptchaVerifier;
+      const appVerifier = (window as any).recaptchaVerifier;
       const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
       setConfirmationResult(confirmation);
       alert(t('codeSent'));

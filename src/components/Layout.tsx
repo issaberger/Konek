@@ -14,7 +14,7 @@ export default function Layout() {
     );
   }
 
-  const isPublicRoute = location.pathname === '/' || location.pathname === '/index.html' || location.pathname === '/about';
+  const isPublicRoute = location.pathname === '/' || location.pathname === '/index.html' || location.pathname === '/about' || location.pathname === '/terms';
 
   if (!user && !isPublicRoute) {
     return <Navigate to="/" replace />;

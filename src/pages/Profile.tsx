@@ -50,7 +50,6 @@ export default function Profile() {
     try {
       // Compress image using canvas to keep base64 small for Firestore
       const reader = new FileReader();
-      reader.readAsDataURL(file);
       reader.onload = (event) => {
         const img = new Image();
         img.src = event.target?.result as string;
@@ -90,6 +89,7 @@ export default function Profile() {
           setIsSaving(false);
         };
       };
+      reader.readAsDataURL(file);
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, 'users');
       setIsSaving(false);

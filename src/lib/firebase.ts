@@ -9,7 +9,7 @@ const app = initializeApp(firebaseConfig);
 // Initialize App Check
 if (typeof window !== 'undefined') {
   initializeAppCheck(app, {
-    provider: new ReCaptchaEnterpriseProvider('6LeEr7AsAAAAAFyr6c6ANlzYbZ3Za-VfwmT6SZ_s'),
+    provider: new ReCaptchaEnterpriseProvider('6LcAQ7UsAAAAAI25uwIqENu7QO3s46NiTXGkXZ1P'),
     isTokenAutoRefreshEnabled: true
   });
 }
