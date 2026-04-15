@@ -78,6 +78,9 @@ export const signInWithGoogle = async () => {
     console.error("Error signing in with Google", error);
     if (error.code === 'auth/unauthorized-domain') {
       alert("Erè: Ou dwe ajoute domèn sa a nan 'Authorized domains' nan Firebase Console (Authentication -> Settings -> Authorized domains).");
+    } else if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+      // Silent catch for user-initiated cancellation
+      console.log("Sign-in popup closed by user or cancelled.");
     } else {
       alert(`Erè pandan koneksyon an: ${error.message}`);
     }
