@@ -18,6 +18,7 @@ export default function Solver() {
   const [voicePrompt, setVoicePrompt] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isSolving, setIsSolving] = useState(false);
+  const [loadingFactIndex, setLoadingFactIndex] = useState(0);
   const [result, setResult] = useState<{ problemText: string; solutionText: string } | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -39,6 +40,7 @@ export default function Solver() {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
+        // Use both languages for better detection if possible, or stick to current
         recognition.lang = language === 'ht' ? 'ht-HT' : 'fr-FR'; 
         recognition.continuous = false;
         recognition.interimResults = true;
@@ -72,6 +74,10 @@ export default function Solver() {
     if (!image || !user) return;
     
     setIsSolving(true);
+    const factInterval = setInterval(() => {
+      setLoadingFactIndex(prev => (prev + 1) % 4);
+    }, 3000);
+
     try {
       const { problemText, solutionText, practiceQuestion } = await solveHomework(image, voicePrompt, language);
       
@@ -122,6 +128,7 @@ export default function Solver() {
       console.error("Error solving homework:", error);
       alert(`${t('errorOccurred')}: ${error.message || t('unknownError')}`);
     } finally {
+      clearInterval(factInterval);
       setIsSolving(false);
     }
   };
@@ -262,13 +269,18 @@ export default function Solver() {
               <button 
                 onClick={handleSubmit}
                 disabled={isSolving}
-                className="w-full bg-[#D21034] text-white font-bold text-lg py-4 rounded-2xl shadow-lg hover:bg-[#b00d2b] transition-colors disabled:opacity-70 flex items-center justify-center space-x-2"
+                className="w-full bg-[#D21034] text-white font-bold text-lg py-4 rounded-2xl shadow-lg hover:bg-[#b00d2b] transition-colors disabled:opacity-70 flex items-center justify-center space-x-2 overflow-hidden relative"
               >
                 {isSolving ? (
-                  <>
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                    <span>{t('thinking')}</span>
-                  </>
+                  <div className="flex flex-col items-center space-y-2 py-2">
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <span>{t('thinking')}</span>
+                    </div>
+                    <p className="text-xs font-normal animate-pulse px-4 text-center">
+                      {t(`loadingFact${loadingFactIndex + 1}`)}
+                    </p>
+                  </div>
                 ) : (
                   <>
                     <CheckCircle2 className="w-6 h-6" />

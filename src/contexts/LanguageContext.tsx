@@ -93,6 +93,12 @@ export const translations: Translations = {
   step3: { ht: '✅ Mache pou Matematik, Syans, Istwa, ak plis ankò!', fr: '✅ Fonctionne pour les Mathématiques, les Sciences, l\'Histoire, et plus encore !' },
   noStress: { ht: 'Pa gen kat kredi, pa gen estrès. Jis sipò an tan reyèl, tou dwat sou telefòn ou.', fr: 'Pas de carte de crédit, pas de stress. Juste un support en temps réel, directement sur votre téléphone.' },
   tryNow: { ht: '👉 Eseye li kounye a gratis:', fr: '👉 Essayez-le maintenant gratuitement :' },
+  
+  // Loading Facts
+  loadingFact1: { ht: 'Èske w te konnen? Ayiti te premye repiblik nwa nan mond lan.', fr: 'Le saviez-vous ? Haïti a été la première république noire au monde.' },
+  loadingFact2: { ht: 'Konèk ap itilize entèlijans atifisyèl pou ede w konprann devwa w pi byen.', fr: 'Konèk utilise l\'intelligence artificielle pour vous aider à mieux comprendre vos devoirs.' },
+  loadingFact3: { ht: 'Edikasyon se kle pou chanje mond lan. Kontinye travay di!', fr: 'L\'éducation est la clé pour changer le monde. Continuez à travailler dur !' },
+  loadingFact4: { ht: 'Konèk pale Kreyòl ak Fransè pou l ka ede tout elèv Ayisyen.', fr: 'Konèk parle Créole et Français pour aider tous les élèves Haïtiens.' },
 };
 
 interface LanguageContextType {
