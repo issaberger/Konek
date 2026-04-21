@@ -75,7 +75,13 @@ export const translations: Translations = {
   cancel: { ht: 'Anile', fr: 'Annuler' },
   name: { ht: 'Non', fr: 'Nom' },
   notSet: { ht: 'Poko mete', fr: 'Non défini' },
-  changePicture: { ht: 'Chanje Foto', fr: 'Changer la photo' },
+  changePicture: { ht: 'Chanje Foto', fr: 'Modifier la photo' },
+  deleteAccount: { ht: 'Efase Kont', fr: 'Supprimer le compte' },
+  confirmDeleteAccount: { ht: 'Èske ou sèten ou vle efase kont ou a? Sa pa ka anile.', fr: 'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.' },
+  
+  // AI Notice
+  aiNotice: { ht: 'Remak: Konèk itilize entèlijans atifisyèl. Pafwa repons yo ka pa 100% kòrèk. Toujou verifye travay ou!', fr: 'Note : Konèk utilise l\'intelligence artificielle. Parfois, les réponses peuvent ne pas être 100% correctes. Vérifiez toujours votre travail !' },
+  resources: { ht: 'Resous ak Referans', fr: 'Ressources et Références' },
   
   // History Delete
   delete: { ht: 'Efase', fr: 'Supprimer' },
@@ -95,10 +101,15 @@ export const translations: Translations = {
   tryNow: { ht: '👉 Eseye li kounye a gratis:', fr: '👉 Essayez-le maintenant gratuitement :' },
   
   // Loading Facts
-  loadingFact1: { ht: 'Èske w te konnen? Ayiti te premye repiblik nwa nan mond lan.', fr: 'Le saviez-vous ? Haïti a été la première république noire au monde.' },
-  loadingFact2: { ht: 'Konèk ap itilize entèlijans atifisyèl pou ede w konprann devwa w pi byen.', fr: 'Konèk utilise l\'intelligence artificielle pour vous aider à mieux comprendre vos devoirs.' },
-  loadingFact3: { ht: 'Edikasyon se kle pou chanje mond lan. Kontinye travay di!', fr: 'L\'éducation est la clé pour changer le monde. Continuez à travailler dur !' },
-  loadingFact4: { ht: 'Konèk pale Kreyòl ak Fransè pou l ka ede tout elèv Ayisyen.', fr: 'Konèk parle Créole et Français pour aider tous les élèves Haïtiens.' },
+  loadingFact1: { ht: '🇭🇹 Ayiti te premye repiblik nwa nan mond lan an 1804.', fr: '🇭🇹 Haïti a été la première république noire au monde en 1804.' },
+  loadingFact2: { ht: '🧠 Konèk ap itilize entèlijans atifisyèl pou analize foto w la kounye a.', fr: '🧠 Konèk utilise l\'intelligence artificielle pour analyser votre photo en ce moment.' },
+  loadingFact3: { ht: '📚 Edikasyon se sèl zam ou bezwen pou chanje avni w.', fr: '📚 L\'éducation est la seule arme dont vous avez besoin pour changer votre avenir.' },
+  loadingFact4: { ht: '🗣️ Konèk pale Kreyòl ak Fransè pou l ka ede tout elèv Ayisyen.', fr: 'Konèk parle Créole et Français pour aider tous les élèves Haïtiens.' },
+  loadingFact5: { ht: '🌟 Ou se yon jeni! Kontinye poze kesyon pou w ka aprann plis.', fr: '🌟 Vous êtes un génie ! Continuez à poser des questions pour apprendre plus.' },
+  loadingFact6: { ht: '🎨 Sitadèl Laferyè se pi gwo fò nan tout Karayib la.', fr: '🎨 La Citadelle Laferrière est la plus grande forteresse des Caraïbes.' },
+  loadingFact7: { ht: '⚡ Konèk ap prepare yon eksplikasyon etap pa etap pou ou.', fr: '⚡ Konèk prépare une explication étape par étape pour vous.' },
+  loadingFact8: { ht: '🌊 Ayiti vle di "Tè mòn yo" nan lang moun Taino yo.', fr: '🌊 Haïti signifie "Terre des montagnes" dans la langue des Taïnos.' },
+  loadingFact9: { ht: '🚀 Chak devwa ou rezoud ap fè w vin pi entèlijan chak jou.', fr: '🚀 Chaque devoir que vous résolvez vous rend plus intelligent chaque jour.' },
 };
 
 interface LanguageContextType {

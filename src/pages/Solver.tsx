@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Camera, Upload, Mic, MicOff, Volume2, Loader2, CheckCircle2, X } from 'lucide-react';
+import { Camera, Upload, Mic, MicOff, Volume2, Loader2, CheckCircle2, X, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { solveHomework, generateSpeech } from '../services/ai';
@@ -75,8 +75,8 @@ export default function Solver() {
     
     setIsSolving(true);
     const factInterval = setInterval(() => {
-      setLoadingFactIndex(prev => (prev + 1) % 4);
-    }, 3000);
+      setLoadingFactIndex(prev => (prev + 1) % 9);
+    }, 3500);
 
     try {
       const { problemText, solutionText, practiceQuestion } = await solveHomework(image, voicePrompt, language);
@@ -292,23 +292,32 @@ export default function Solver() {
           </div>
         ) : (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white rounded-3xl p-6 shadow-sm space-y-6">
-              <div className="flex justify-between items-start">
-                <h2 className="text-xl font-bold text-gray-900">{t('explanation')}</h2>
-                <button 
-                  onClick={playAudio}
-                  className={`p-3 rounded-full transition-colors ${isPlayingAudio ? 'bg-[#00209F] text-white shadow-md' : 'bg-blue-50 text-[#00209F]'}`}
-                >
-                  <Volume2 className="w-6 h-6" />
-                </button>
+              <div className="bg-white rounded-3xl p-6 shadow-sm space-y-6">
+                <div className="flex justify-between items-start">
+                  <h2 className="text-xl font-bold text-gray-900">{t('explanation')}</h2>
+                  <button 
+                    onClick={playAudio}
+                    className={`p-3 rounded-full transition-colors ${isPlayingAudio ? 'bg-[#00209F] text-white shadow-md' : 'bg-blue-50 text-[#00209F]'}`}
+                  >
+                    <Volume2 className="w-6 h-6" />
+                  </button>
+                </div>
+                
+                <div className="prose prose-blue max-w-none">
+                  <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                    {result.solutionText}
+                  </Markdown>
+                </div>
+
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-start space-x-3">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-amber-800 leading-relaxed font-medium">
+                      {t('aiNotice')}
+                    </p>
+                  </div>
+                </div>
               </div>
-              
-              <div className="prose prose-blue max-w-none">
-                <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-                  {result.solutionText}
-                </Markdown>
-              </div>
-            </div>
 
             <button 
               onClick={() => {

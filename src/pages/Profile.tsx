@@ -1,19 +1,27 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { db, logout, handleFirestoreError, OperationType } from '../lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
-import { updateProfile } from 'firebase/auth';
-import { Flame, Star, Award, LogOut, Info, Edit2, Camera, X, Check } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { db, logout, handleFirestoreError, OperationType, auth } from '../lib/firebase';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { updateProfile, deleteUser } from 'firebase/auth';
+import { Flame, Star, Award, LogOut, Info, Edit2, Camera, X, Check, Trash2, AlertTriangle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Profile() {
   const { user, userData, refreshUserData } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (userData && !isEditing) {
+      setEditName(userData.displayName || '');
+    }
+  }, [userData, isEditing]);
 
   if (!userData) return null;
 
@@ -42,20 +50,42 @@ export default function Profile() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    try {
+      // 1. Delete Firestore data
+      await deleteDoc(doc(db, 'users', user.uid));
+      // 2. Delete Auth user
+      await deleteUser(user);
+      navigate('/');
+    } catch (error: any) {
+      console.error("Error deleting account:", error);
+      if (error.code === 'auth/requires-recent-login') {
+        alert("Pou sekirite, ou dwe rekonekte anvan ou efase kont ou.");
+        await logout();
+        navigate('/');
+      } else {
+        alert("Erè pandan n ap efase kont lan.");
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
     setIsSaving(true);
     try {
-      // Compress image using canvas to keep base64 small for Firestore
       const reader = new FileReader();
       reader.onload = (event) => {
         const img = new Image();
         img.src = event.target?.result as string;
         img.onload = async () => {
           const canvas = document.createElement('canvas');
-          const MAX_SIZE = 150;
+          const MAX_SIZE = 400; // Increased size for better quality
           let width = img.width;
           let height = img.height;
 
@@ -74,16 +104,35 @@ export default function Profile() {
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
+          if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, width, height);
+          }
           
-          const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+          const base64Image = canvas.toDataURL('image/jpeg', 0.8);
 
-          // Update Firebase Auth
-          await updateProfile(user, { photoURL: base64Image });
-          
-          // Update Firestore
+          // Update Firestore with full-sized base64 (safe up to 1MB)
           const userRef = doc(db, 'users', user.uid);
           await updateDoc(userRef, { photoURL: base64Image });
+
+          // Create a much smaller thumbnail for Firebase Auth (limit is ~2KB)
+          const thumbCanvas = document.createElement('canvas');
+          const THUMB_SIZE = 50;
+          thumbCanvas.width = THUMB_SIZE;
+          thumbCanvas.height = THUMB_SIZE;
+          const thumbCtx = thumbCanvas.getContext('2d');
+          if (thumbCtx) {
+            thumbCtx.drawImage(img, 0, 0, THUMB_SIZE, THUMB_SIZE);
+          }
+          const thumbBase64 = thumbCanvas.toDataURL('image/jpeg', 0.5);
+
+          try {
+            // Update Firebase Auth with the small thumbnail
+            await updateProfile(user, { photoURL: thumbBase64 });
+          } catch (authError) {
+            console.warn("Auth photoURL update failed (likely still too long), but Firestore is updated:", authError);
+          }
           
           await refreshUserData();
           setIsSaving(false);
@@ -229,6 +278,42 @@ export default function Profile() {
             <span className="font-bold text-gray-900">{t('about')}</span>
           </div>
         </Link>
+
+        {/* Danger Zone */}
+        <div className="pt-4">
+          {!showDeleteConfirm ? (
+            <button 
+              onClick={() => setShowDeleteConfirm(true)}
+              className="w-full flex items-center justify-center space-x-2 text-red-500 text-sm font-medium p-4 hover:bg-red-50 rounded-2xl transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>{t('deleteAccount')}</span>
+            </button>
+          ) : (
+            <div className="bg-red-50 border border-red-100 rounded-3xl p-6 space-y-4 animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center space-x-3 text-red-600">
+                <AlertTriangle className="w-6 h-6" />
+                <p className="font-bold">{t('confirmDeleteAccount')}</p>
+              </div>
+              <div className="flex space-x-3">
+                <button 
+                  onClick={handleDeleteAccount}
+                  disabled={isSaving}
+                  className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-red-700 transition-colors flex justify-center items-center"
+                >
+                  {isSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : t('delete')}
+                </button>
+                <button 
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isSaving}
+                  className="flex-1 bg-white text-gray-600 py-3 rounded-xl font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+                >
+                  {t('cancel')}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );

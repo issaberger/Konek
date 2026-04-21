@@ -18,6 +18,9 @@ export const auth = getAuth(app);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
 
 export enum OperationType {
   CREATE = 'create',
@@ -77,7 +80,7 @@ export const signInWithGoogle = async () => {
   } catch (error: any) {
     console.error("Error signing in with Google", error);
     if (error.code === 'auth/unauthorized-domain') {
-      alert("Erè: Ou dwe ajoute domèn sa a nan 'Authorized domains' nan Firebase Console (Authentication -> Settings -> Authorized domains).");
+      alert(`Erè: Ou dwe ajoute domèn sa a (${window.location.host}) nan 'Authorized domains' nan Firebase Console (Authentication -> Settings -> Authorized domains).`);
     } else if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
       // Silent catch for user-initiated cancellation
       console.log("Sign-in popup closed by user or cancelled.");

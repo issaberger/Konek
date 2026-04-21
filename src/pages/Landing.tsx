@@ -40,13 +40,10 @@ export default function Landing() {
   };
 
   const handleGoogleLogin = async () => {
-    setIsLoggingIn(true);
     try {
       await signInWithGoogle();
     } catch (error) {
       console.error(error);
-    } finally {
-      setIsLoggingIn(false);
     }
   };
 

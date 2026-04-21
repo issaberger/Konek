@@ -82,7 +82,8 @@ export const solveHomework = async (imageFile: File, voicePrompt?: string, langu
       2. Be encouraging and proud of Haitian culture.
       3. Break down the solution into clear steps.
       4. Use Markdown for formatting. Use MathJax (e.g., $$x^2$$ or $x$) for math.
-      5. End with an encouraging message.
+      5. Include a section called "Resous ak Referans" (in ${langName}) at the end with 2-3 helpful links or book references related to the topic.
+      6. End with an encouraging message.
     `;
 
     const grokApiKey = (import.meta as any).env.VITE_GROK_API_KEY;
@@ -99,9 +100,10 @@ export const solveHomework = async (imageFile: File, voicePrompt?: string, langu
           body: JSON.stringify({
             model: "grok-beta",
             messages: [
-              { role: "system", content: `You are Konèk, a patient, warm, and encouraging AI homework tutor for students in Haiti. Respond entirely in ${langName}. Use Markdown and MathJax.` },
-              { role: "user", content: tutorPrompt }
-            ]
+              { role: "user", content: `System: You are Konèk, a patient, warm, and encouraging AI homework tutor for students in Haiti. Respond entirely in ${langName}. Use Markdown and MathJax.\n\n${tutorPrompt}` }
+            ],
+            stream: false,
+            temperature: 0.7
           })
         });
         
