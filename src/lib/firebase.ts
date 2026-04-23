@@ -1,26 +1,12 @@
 import { initializeApp } from 'firebase/app';
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { getAuth, signOut, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
 
-// Initialize App Check
-if (typeof window !== 'undefined') {
-  initializeAppCheck(app, {
-    provider: new ReCaptchaEnterpriseProvider('6LcAQ7UsAAAAAI25uwIqENu7QO3s46NiTXGkXZ1P'),
-    isTokenAutoRefreshEnabled: true
-  });
-}
-
 export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
-
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: 'select_account'
-});
+export const db = getFirestore(app);
 
 export enum OperationType {
   CREATE = 'create',
@@ -72,24 +58,6 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   console.error('Firestore Error: ', JSON.stringify(errInfo));
   throw new Error(JSON.stringify(errInfo));
 }
-
-export const signInWithGoogle = async () => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result.user;
-  } catch (error: any) {
-    console.error("Error signing in with Google", error);
-    if (error.code === 'auth/unauthorized-domain') {
-      alert(`Erè: Ou dwe ajoute domèn sa a (${window.location.host}) nan 'Authorized domains' nan Firebase Console (Authentication -> Settings -> Authorized domains).`);
-    } else if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-      // Silent catch for user-initiated cancellation
-      console.log("Sign-in popup closed by user or cancelled.");
-    } else {
-      alert(`Erè pandan koneksyon an: ${error.message}`);
-    }
-    throw error;
-  }
-};
 
 export const logout = async () => {
   try {

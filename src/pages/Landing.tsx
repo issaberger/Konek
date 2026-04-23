@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { signInWithGoogle, auth } from '../lib/firebase';
+import { auth } from '../lib/firebase';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
-import { BookOpen, Sparkles, Globe, Phone, ArrowRight, Info, X, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Globe, Phone, ArrowRight, Info, X, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 
 export default function Landing() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isPhoneAuth, setIsPhoneAuth] = useState(false);
   const [countryCode, setCountryCode] = useState('+509');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
@@ -39,14 +38,6 @@ export default function Landing() {
     setShowWelcome(false);
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      await signInWithGoogle();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const handleSendCode = async () => {
     if (!phoneNumber) return;
     setIsLoggingIn(true);
@@ -59,8 +50,8 @@ export default function Landing() {
       alert(t('codeSent'));
     } catch (error: any) {
       console.error(error);
-      if (error.code === 'auth/unauthorized-domain') {
-        alert(t('phoneAuthError'));
+      if (error.code === 'auth/unauthorized-domain' || error.code === 'auth/captcha-check-failed') {
+        alert(`Erè: Ou dwe ajoute domèn sa a nan Firebase Console.\n\nTanpri kopye domèn sa a epi ajoute l nan Firebase -> Authentication -> Settings -> Authorized Domains:\n\n${window.location.host}`);
       } else {
         alert(`${t('invalidPhone')} (${error.message})`);
       }
@@ -118,93 +109,58 @@ export default function Landing() {
         </div>
 
         <div className="w-full space-y-4 pt-4">
-          {!isPhoneAuth ? (
-            <>
-              <button
-                onClick={handleGoogleLogin}
-                disabled={isLoggingIn}
-                className="w-full flex items-center justify-center space-x-3 bg-white text-[#D21034] py-4 px-6 rounded-2xl font-bold text-lg shadow-xl hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-70"
-              >
-                {isLoggingIn ? (
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#D21034] border-t-transparent"></div>
-                ) : (
-                  <>
-                    <Sparkles className="w-6 h-6 text-[#00209F]" />
-                    <span>{t('loginWithGoogle')}</span>
-                  </>
-                )}
-              </button>
-              
-              <div className="flex items-center justify-center space-x-2 text-white/80">
-                <div className="h-px w-12 bg-white/30"></div>
-                <span className="text-xs font-bold">{t('or')}</span>
-                <div className="h-px w-12 bg-white/30"></div>
-              </div>
-
-              <button
-                onClick={() => setIsPhoneAuth(true)}
-                className="w-full flex items-center justify-center space-x-3 bg-[#00209F] text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-xl hover:bg-[#001a80] active:scale-95 transition-all"
-              >
-                <Phone className="w-6 h-6" />
-                <span>{t('phoneSignIn')}</span>
-              </button>
-            </>
-          ) : (
-            <div className="bg-white p-6 rounded-3xl shadow-2xl space-y-4 text-left animate-in fade-in slide-in-from-bottom-4">
-              <button onClick={() => setIsPhoneAuth(false)} className="text-sm text-gray-500 hover:text-gray-800 mb-2 font-medium">← Back</button>
-              
-              {!confirmationResult ? (
-                <>
-                  <label className="block text-sm font-bold text-gray-700">{t('phoneNumber')}</label>
-                  <div className="flex space-x-2">
-                    <select
-                      value={countryCode}
-                      onChange={(e) => setCountryCode(e.target.value)}
-                      className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[#D21034]/50 w-28 text-base"
-                    >
-                      {COUNTRIES.map((country, idx) => (
-                        <option key={idx} value={country.code}>
-                          {country.flag} {country.code}
-                        </option>
-                      ))}
-                    </select>
-                    <input 
-                      type="tel" 
-                      placeholder="3000 0000" 
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D21034]/50"
-                    />
-                  </div>
-                  <button
-                    onClick={handleSendCode}
-                    disabled={isLoggingIn || !phoneNumber}
-                    className="w-full bg-[#D21034] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#b00d2b] transition-colors disabled:opacity-70 flex justify-center items-center"
+          <div className="bg-white p-6 rounded-3xl shadow-2xl space-y-4 text-left animate-in fade-in slide-in-from-bottom-4">
+            {!confirmationResult ? (
+              <>
+                <label className="block text-sm font-bold text-gray-700">{t('phoneNumber')}</label>
+                <div className="flex space-x-2">
+                  <select
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[#D21034]/50 w-28 text-base"
                   >
-                    {isLoggingIn ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div> : t('sendCode')}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <label className="block text-sm font-bold text-gray-700">{t('enterCode')}</label>
+                    {COUNTRIES.map((country, idx) => (
+                      <option key={idx} value={country.code}>
+                        {country.flag} {country.code}
+                      </option>
+                    ))}
+                  </select>
                   <input 
-                    type="text" 
-                    placeholder="123456" 
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D21034]/50 text-center tracking-widest text-lg font-bold"
+                    type="tel" 
+                    placeholder="3000 0000" 
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D21034]/50"
                   />
-                  <button
-                    onClick={handleVerifyCode}
-                    disabled={isLoggingIn || !verificationCode}
-                    className="w-full bg-[#00209F] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#001a80] transition-colors disabled:opacity-70 flex justify-center items-center"
-                  >
-                    {isLoggingIn ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div> : t('verifyCode')}
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+                </div>
+                <button
+                  onClick={handleSendCode}
+                  disabled={isLoggingIn || !phoneNumber}
+                  className="w-full bg-[#D21034] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#b00d2b] transition-colors disabled:opacity-70 flex justify-center items-center"
+                >
+                  {isLoggingIn ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div> : t('sendCode')}
+                </button>
+              </>
+            ) : (
+              <>
+                <label className="block text-sm font-bold text-gray-700">{t('enterCode')}</label>
+                <input 
+                  type="text" 
+                  placeholder="123456" 
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D21034]/50 text-center tracking-widest text-lg font-bold"
+                />
+                <button
+                  onClick={handleVerifyCode}
+                  disabled={isLoggingIn || !verificationCode}
+                  className="w-full bg-[#00209F] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#001a80] transition-colors disabled:opacity-70 flex justify-center items-center"
+                >
+                  {isLoggingIn ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div> : t('verifyCode')}
+                </button>
+              </>
+            )}
+          </div>
           
           <p className="text-sm text-white/80 font-medium pt-4">
             {t('startLearning')}
