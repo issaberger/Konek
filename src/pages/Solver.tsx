@@ -1,17 +1,13 @@
 import { useState, useRef } from 'react';
 import { Camera, Upload, Mic, MicOff, Volume2, Loader2, CheckCircle2, X, AlertTriangle } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { solveHomework, generateSpeech } from '../services/ai';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { collection, addDoc, doc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 import Markdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
 export default function Solver() {
-  const { user, refreshUserData } = useAuth();
   const { t, language } = useLanguage();
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -71,7 +67,7 @@ export default function Solver() {
   };
 
   const handleSubmit = async () => {
-    if (!image || !user) return;
+    if (!image) return;
     
     setIsSolving(true);
     const factInterval = setInterval(() => {
@@ -79,50 +75,9 @@ export default function Solver() {
     }, 3500);
 
     try {
-      const { problemText, solutionText, practiceQuestion } = await solveHomework(image, voicePrompt, language);
+      const { problemText, solutionText } = await solveHomework(image, voicePrompt, language);
       
       setResult({ problemText, solutionText });
-
-      let homeworkRef;
-      try {
-        homeworkRef = await addDoc(collection(db, 'homeworks'), {
-          userId: user.uid,
-          problem_text: problemText,
-          solution_text: solutionText,
-          created_at: serverTimestamp()
-        });
-      } catch (e) {
-        handleFirestoreError(e, OperationType.CREATE, 'homeworks');
-        throw e;
-      }
-
-      if (practiceQuestion && practiceQuestion.question) {
-        try {
-          await addDoc(collection(db, 'practice_questions'), {
-            userId: user.uid,
-            homeworkId: homeworkRef.id,
-            ...practiceQuestion,
-            completed: false
-          });
-        } catch (e) {
-          handleFirestoreError(e, OperationType.CREATE, 'practice_questions');
-          throw e;
-        }
-      }
-
-      try {
-        const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, {
-          points: increment(50),
-          homework_solved: increment(1),
-          last_active: new Date().toISOString()
-        });
-      } catch (e) {
-        handleFirestoreError(e, OperationType.UPDATE, 'users');
-        throw e;
-      }
-
-      await refreshUserData();
 
     } catch (error: any) {
       console.error("Error solving homework:", error);
