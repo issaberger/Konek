@@ -13,8 +13,11 @@ export default function Profile() {
     name: '',
     age: '',
     grade: '',
-    school: ''
+    school: '',
+    avatar: '🤖'
   });
+
+  const avatarOptions = ['🤖', '👽', '👾', '👻', '👑', '🦁', '🚀', '🌟', '🦄', '🦖', '🐼', '🦊'];
 
   useEffect(() => {
     const profileStr = localStorage.getItem('konek_user_profile');
@@ -25,7 +28,8 @@ export default function Profile() {
           name: data.name || '',
           age: data.age || '',
           grade: data.grade || '',
-          school: data.school || ''
+          school: data.school || '',
+          avatar: data.avatar || '🤖'
         });
       } catch (e) {
         console.error("Failed to parse profile", e);
@@ -40,6 +44,7 @@ export default function Profile() {
         age: formData.age.trim(),
         grade: formData.grade.trim(),
         school: formData.school.trim(),
+        avatar: formData.avatar,
         updatedAt: new Date().toISOString()
       };
       localStorage.setItem('konek_user_profile', JSON.stringify(secureData));
@@ -49,11 +54,19 @@ export default function Profile() {
     }
   };
 
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
   const handleLogout = () => {
-    if (window.confirm(t('confirmDeleteAccount'))) {
-      localStorage.removeItem('konek_user_profile');
-      navigate('/');
-    }
+    setIsConfirmingDelete(true);
+  };
+
+  const confirmDelete = () => {
+    localStorage.removeItem('konek_user_profile');
+    navigate('/');
+  };
+
+  const cancelDelete = () => {
+    setIsConfirmingDelete(false);
   };
 
   return (
@@ -94,16 +107,46 @@ export default function Profile() {
           </div>
 
           <div className="flex flex-col items-center mt-4 mb-6">
-            <div className="w-24 h-24 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-full flex items-center justify-center border-4 border-white/10 shadow-xl mb-4">
-              <span className="text-4xl font-black text-white">
-                {formData.name.charAt(0).toUpperCase() || 'K'}
-              </span>
+            <div className="relative group">
+              <div className="w-28 h-28 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 rounded-[2rem] flex items-center justify-center border-4 border-white/20 shadow-2xl mb-4 transform group-hover:scale-105 transition-all duration-300">
+                <span className="text-6xl drop-shadow-lg">
+                  {formData.avatar}
+                </span>
+              </div>
+              {isEditing && (
+                <div className="absolute inset-0 bg-black/40 rounded-[2rem] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                   <p className="text-white font-bold text-xs">{t('editAvatar')}</p>
+                </div>
+              )}
             </div>
-            {!isEditing && <h2 className="text-2xl font-black text-white text-center">{formData.name}</h2>}
+            {!isEditing && <h2 className="text-3xl font-black text-white text-center drop-shadow-md">{formData.name}</h2>}
           </div>
 
           {isEditing ? (
-            <div className="space-y-4">
+            <div className="space-y-5">
+              
+              {/* Avatar Selector */}
+              <div>
+                 <label className="text-xs font-black text-indigo-300 uppercase tracking-widest pl-2 mb-2 block">
+                  {t('chooseAvatar')}
+                </label>
+                <div className="grid grid-cols-6 gap-2">
+                  {avatarOptions.map(avatar => (
+                    <button
+                      key={avatar}
+                      onClick={() => setFormData({...formData, avatar})}
+                      className={`h-12 text-2xl flex items-center justify-center rounded-xl transition-all ${
+                        formData.avatar === avatar 
+                          ? 'bg-amber-400 scale-110 shadow-[0_0_15px_rgba(251,191,36,0.5)] z-10' 
+                          : 'bg-white/5 hover:bg-white/20'
+                      }`}
+                    >
+                      {avatar}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <label className="text-xs font-black text-indigo-300 uppercase tracking-widest pl-2 mb-1 block">
                   {t('name')}
@@ -219,6 +262,35 @@ export default function Profile() {
         </motion.div>
 
       </main>
+
+      {/* Delete Confirmation Modal */}
+      {isConfirmingDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-900 border border-rose-500/30 p-6 rounded-3xl max-w-sm w-full shadow-2xl relative overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 w-full h-1 bg-rose-500"></div>
+            <h3 className="text-xl font-black text-white mb-2">{t('deleteAccount')}</h3>
+            <p className="text-slate-300 mb-6 font-medium">{t('confirmDeleteAccount')}</p>
+            <div className="flex space-x-3">
+              <button 
+                onClick={cancelDelete}
+                className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                {t('cancel')}
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-[0_0_15px_rgba(225,29,72,0.5)]"
+              >
+                {t('deleteAccount')}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

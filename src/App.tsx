@@ -8,6 +8,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import Welcome from './pages/Welcome';
 import Solver from './pages/Solver';
 import Profile from './pages/Profile';
+import DiscoverHaiti from './pages/DiscoverHaiti';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const hasProfile = localStorage.getItem('konek_user_profile');
@@ -28,6 +29,11 @@ export default function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          } />
+          <Route path="/discover" element={
+            <ProtectedRoute>
+              <DiscoverHaiti />
             </ProtectedRoute>
           } />
         </Routes>

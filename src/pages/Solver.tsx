@@ -12,6 +12,7 @@ export default function Solver() {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [userName, setUserName] = useState('');
+  const [userAvatar, setUserAvatar] = useState('');
   
   useEffect(() => {
     const profileStr = localStorage.getItem('konek_user_profile');
@@ -19,6 +20,7 @@ export default function Solver() {
       try {
         const data = JSON.parse(profileStr);
         setUserName(data.name || '');
+        setUserAvatar(data.avatar || '');
       } catch(e) {}
     }
   }, []);
@@ -148,15 +150,26 @@ export default function Solver() {
             {t('takePicture')}
           </p>
         </div>
-        <button 
-          onClick={() => {
-            navigate('/profile');
-          }}
-          className="p-2 text-gray-400 hover:text-[#D21034] transition-colors rounded-full hover:bg-red-50"
-          title={t('profile')}
-        >
-          <UserCircle className="w-8 h-8" />
-        </button>
+        <div className="flex items-center space-x-2">
+          <button 
+            onClick={() => navigate('/discover')}
+            className="p-2 text-amber-500 hover:text-amber-600 transition-colors rounded-full hover:bg-amber-50"
+            title="Discover Haiti"
+          >
+            <span className="text-xl leading-none">🇭🇹</span>
+          </button>
+          <button 
+            onClick={() => navigate('/profile')}
+            className="p-2 text-gray-400 hover:text-[#D21034] transition-colors rounded-full hover:bg-red-50"
+            title={t('profile')}
+          >
+            {userAvatar ? (
+               <span className="text-3xl leading-none">{userAvatar}</span>
+            ) : (
+               <UserCircle className="w-8 h-8" />
+            )}
+          </button>
+        </div>
       </header>
 
       <main className="flex-1 p-4 space-y-6 pb-24">
