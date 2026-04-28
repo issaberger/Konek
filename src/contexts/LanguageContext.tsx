@@ -110,6 +110,24 @@ export const translations: Translations = {
   loadingFact7: { ht: '⚡ Konèk ap prepare yon eksplikasyon etap pa etap pou ou.', fr: '⚡ Konèk prépare une explication étape par étape pour vous.' },
   loadingFact8: { ht: '🌊 Ayiti vle di "Tè mòn yo" nan lang moun Taino yo.', fr: '🌊 Haïti signifie "Terre des montagnes" dans la langue des Taïnos.' },
   loadingFact9: { ht: '🚀 Chak devwa ou rezoud ap fè w vin pi entèlijan chak jou.', fr: '🚀 Chaque devoir que vous résolvez vous rend plus intelligent chaque jour.' },
+  
+  // Onboarding
+  welcomeHeadline: { ht: 'Pare pou w briye? 🚀', fr: 'Prêt à briller ? 🚀' },
+  welcomeSub: { ht: 'Konèk se asistan entèlijan w ki la pou l ede w kraze tout devwa w yo. Ann kreye pwofil chanpyon ou an!', fr: 'Konèk est votre assistant intelligent. Créons votre profil de champion !' },
+  startOnboarding: { ht: 'Kòmanse', fr: 'Commencer' },
+  stepNameTitle: { ht: 'Ki jan w rele, chanpyon? 🏆', fr: 'Comment t\'appelles-tu, champion ? 🏆' },
+  placeholderName: { ht: 'Antre tinon w (Sousekou)...', fr: 'Entrez votre pseudo...' },
+  stepAgeClassTitle: { ht: 'Ki klas ou ye kounye a? 🎯', fr: 'Quelle est ta classe actuelle ? 🎯' },
+  age: { ht: 'Laj ou', fr: 'Votre Âge' },
+  gradeLabel: { ht: 'Nan ki klas ou ye? (Egzanp: NS3, Philo...)', fr: 'Votre Classe (Ex: NS3, Terminale...)' },
+  stepSchoolTitle: { ht: 'Nan ki akademi w ap fòme lespri w? 🏫', fr: 'Dans quelle académie étudies-tu ? 🏫' },
+  schoolName: { ht: 'Ekri non lekòl ou la...', fr: 'Écris le nom de ton école...' },
+  finishBtn: { ht: 'Sove Pwofil Mwen! 🌟', fr: 'Sauvegarder ! 🌟' },
+  nextBtn: { ht: 'Kontinye', fr: 'Continuer' },
+  backBtn: { ht: 'Tounen', fr: 'Retour' },
+  greeting: { ht: 'Bonjou', fr: 'Bonjour' },
+  resetProfile: { ht: 'Chanje Pwofil', fr: 'Modifier le profil' },
+  level: { ht: 'ETAP', fr: 'ÉTAPE' },
 };
 
 interface LanguageContextType {

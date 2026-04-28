@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react';
-import { Camera, Upload, Mic, MicOff, Volume2, Loader2, CheckCircle2, X, AlertTriangle } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Camera, Upload, Mic, MicOff, Volume2, Loader2, CheckCircle2, X, AlertTriangle, UserCircle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 import { solveHomework, generateSpeech } from '../services/ai';
 import Markdown from 'react-markdown';
 import remarkMath from 'remark-math';
@@ -9,6 +10,19 @@ import 'katex/dist/katex.min.css';
 
 export default function Solver() {
   const { t, language } = useLanguage();
+  const navigate = useNavigate();
+  const [userName, setUserName] = useState('');
+  
+  useEffect(() => {
+    const profileStr = localStorage.getItem('konek_user_profile');
+    if (profileStr) {
+      try {
+        const data = JSON.parse(profileStr);
+        setUserName(data.name || '');
+      } catch(e) {}
+    }
+  }, []);
+
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [voicePrompt, setVoicePrompt] = useState('');
@@ -129,8 +143,20 @@ export default function Solver() {
       <header className="bg-white p-4 shadow-sm sticky top-0 z-10 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold text-[#00209F]">{t('solverTitle')}</h1>
-          <p className="text-sm text-gray-500">{t('takePicture')}</p>
+          <p className="text-sm text-gray-500">
+            {userName ? <><span className="font-bold text-gray-800">{t('greeting')}, {userName}!</span> <br/></> : ''}
+            {t('takePicture')}
+          </p>
         </div>
+        <button 
+          onClick={() => {
+            navigate('/profile');
+          }}
+          className="p-2 text-gray-400 hover:text-[#D21034] transition-colors rounded-full hover:bg-red-50"
+          title={t('profile')}
+        >
+          <UserCircle className="w-8 h-8" />
+        </button>
       </header>
 
       <main className="flex-1 p-4 space-y-6 pb-24">
