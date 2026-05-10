@@ -130,12 +130,6 @@ export const translations: Translations = {
   level: { ht: 'ETAP', fr: 'ÉTAPE' },
   
   // Profile Additions
-  confirmDeleteAccount: { ht: 'Èske w sèten w vle efase pwofil ou a? Tout done w yo ap pèdi.', fr: 'Êtes-vous sûr de vouloir supprimer votre profil ? Toutes vos données seront perdues.' },
-  deleteAccount: { ht: 'Efase Pwofil la', fr: 'Supprimer le profil' },
-  editProfile: { ht: 'Chanje', fr: 'Modifier' },
-  save: { ht: 'Sove', fr: 'Enregistrer' },
-  cancel: { ht: 'Anile', fr: 'Annuler' },
-  name: { ht: 'Non', fr: 'Nom' },
   chooseAvatar: { ht: 'Chwazi yon Avatar', fr: 'Choisir un avatar' },
   editAvatar: { ht: 'Chanje Avatar', fr: 'Modifier l\'avatar' },
 };
