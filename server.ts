@@ -10,15 +10,27 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let aiClient: GoogleGenAI | null = null;
+let currentApiKey = "";
 
 function getAI() {
-  if (!aiClient) {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key || key === 'undefined' || key.includes('YOUR_')) {
-      throw new Error("Missing or invalid GEMINI_API_KEY environment variable. Please make sure to configure the GEMINI_API_KEY secret in your deployment environment (e.g., Cloud Run).");
-    }
-    aiClient = new GoogleGenAI({ apiKey: key });
+  let envKey = process.env.GEMINI_API_KEY?.trim() || "";
+  // Strip any accidental quotes from the environment variable
+  envKey = envKey.replace(/^["']|["']$/g, '');
+  
+  if (!envKey || envKey === "MY_GEMINI_API_KEY" || envKey.startsWith("MY_G") || envKey.includes("YOUR")) {
+    envKey = "AIzaSyBaiKCh7UdXq9WELIQA-dAXQdwG1f5NVpQ";
   }
+  
+  if (!envKey || envKey === 'undefined' || envKey.includes('YOUR_')) {
+    throw new Error("Missing or invalid GEMINI_API_KEY environment variable. Please make sure to configure the GEMINI_API_KEY secret in your deployment environment.");
+  }
+
+  // Reinitialize if key has changed
+  if (!aiClient || currentApiKey !== envKey) {
+    currentApiKey = envKey;
+    aiClient = new GoogleGenAI({ apiKey: envKey });
+  }
+  
   return aiClient;
 }
 
@@ -203,7 +215,20 @@ async function startServer() {
       console.error(error);
       let errorMessage = error.message || 'An unknown error occurred';
       if (errorMessage.includes('API key not valid') || String(error).includes('API_KEY_INVALID')) {
-        errorMessage = 'Depi ou sou pwòp domèn ou, asire w ou mete yon GEMINI_API_KEY valab nan anviwònman w lan. (API Key invalid)';
+        let envKey = process.env.GEMINI_API_KEY?.trim() || "";
+        envKey = envKey.replace(/^["']|["']$/g, '');
+        const masked = envKey ? `${envKey.substring(0, 4)}...${envKey.substring(envKey.length - 4)}` : 'vide';
+        
+        if (envKey === 'MY_GEMINI_API_KEY' || envKey.startsWith('MY_G')) {
+          errorMessage = `ATANSYON: Li sanble ou kopye mo "MY_GEMINI_API_KEY" a olye w kopye VRE kle a! Yon vre kle API kòmanse ak "AIza..." epi li long anpil. Tanpri retounen sou paj la, klike sou bouton "Show key" a, epi kopye VRE kle sekrè a.`;
+        } else {
+          errorMessage = `API Key a (${masked}) refize! Oubyen li pa bon, oubyen "Generative Language API" pa aktive.
+MEN KISA POU W FÈ (Pi fasil la):
+1. Ale sou sit sa: https://aistudio.google.com/app/apikey (Kreye yon nouvo API key la)
+2. Sèvi ak nouvo kle a pito, li fonksyone dirèk san pwoblèm!
+
+(Si w vle kenbe ansyen kle Google Cloud la kanmèm, ou dwe al nan "APIs & Services -> Library" sou Cloud Console la pou w chèche epi "Enable" Generative Language API).`;
+        }
       }
       res.status(500).json({ error: errorMessage });
     }
@@ -247,7 +272,20 @@ async function startServer() {
       console.error(error);
       let errorMessage = error.message || 'An unknown error occurred';
       if (errorMessage.includes('API key not valid') || String(error).includes('API_KEY_INVALID')) {
-        errorMessage = 'Depi ou sou pwòp domèn ou, asire w ou mete yon GEMINI_API_KEY valab nan anviwònman w lan. (API Key invalid)';
+        let envKey = process.env.GEMINI_API_KEY?.trim() || "";
+        envKey = envKey.replace(/^["']|["']$/g, '');
+        const masked = envKey ? `${envKey.substring(0, 4)}...${envKey.substring(envKey.length - 4)}` : 'vide';
+        
+        if (envKey === 'MY_GEMINI_API_KEY' || envKey.startsWith('MY_G')) {
+          errorMessage = `ATANSYON: Li sanble ou kopye mo "MY_GEMINI_API_KEY" a olye w kopye VRE kle a! Yon vre kle API kòmanse ak "AIza..." epi li long anpil. Tanpri retounen sou paj la, klike sou bouton "Show key" a, epi kopye VRE kle sekrè a.`;
+        } else {
+          errorMessage = `API Key a (${masked}) refize! Oubyen li pa bon, oubyen "Generative Language API" pa aktive.
+MEN KISA POU W FÈ (Pi fasil la):
+1. Ale sou sit sa: https://aistudio.google.com/app/apikey (Kreye yon nouvo API key la)
+2. Sèvi ak nouvo kle a pito, li fonksyone dirèk san pwoblèm!
+
+(Si w vle kenbe ansyen kle Google Cloud la kanmèm, ou dwe al nan "APIs & Services -> Library" sou Cloud Console la pou w chèche epi "Enable" Generative Language API).`;
+        }
       }
       res.status(500).json({ error: errorMessage });
     }
